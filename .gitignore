@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / frontend
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# ML artifacts
+*.ckpt
+*.pt
+*.onnx
+*.bin
+mlruns/
+wandb/
+ml/data/raw/
+ml/data/processed/
+
+# Docker
+*.log
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
