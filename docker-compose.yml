@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vulnscope
+      POSTGRES_PASSWORD: vulnscope
+      POSTGRES_DB: vulnscope
+    ports:
+      - "5432:5432"
+    volumes:
+      - vulnscope_db_data:/var/lib/postgresql/data
+
+volumes:
+  vulnscope_db_data:
