@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     semgrep_timeout_seconds: int = 30
     bandit_timeout_seconds: int = 15
     eslint_timeout_seconds: int = 30
+    jwt_secret_key: str = "dev-secret-change-me"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 60 * 24 * 7
 
     class Config:
         env_file = ".env"
