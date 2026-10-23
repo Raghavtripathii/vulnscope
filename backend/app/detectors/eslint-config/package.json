@@ -1,0 +1,8 @@
+{
+  "name": "vulnscope-eslint-config",
+  "private": true,
+  "devDependencies": {
+    "eslint": "8.57.0",
+    "eslint-plugin-security": "3.0.1"
+  }
+}
