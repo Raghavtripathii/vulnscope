@@ -11,5 +11,16 @@ services:
     volumes:
       - vulnscope_db_data:/var/lib/postgresql/data
 
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://vulnscope:vulnscope@db:5432/vulnscope
+      JWT_SECRET_KEY: dev-secret-change-me-later
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
 volumes:
   vulnscope_db_data:
