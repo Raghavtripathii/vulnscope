@@ -1,0 +1,25 @@
+{
+  "note": "SANITY CHECK ONLY - tiny subset, 1 epoch. Not a result.",
+  "model": "microsoft/codebert-base",
+  "n_train": 2000,
+  "n_test": 500,
+  "max_len": 256,
+  "epochs": 1,
+  "gpu": "Tesla T4",
+  "train_seconds": 30.3,
+  "loss_first10_avg": 0.7056,
+  "loss_last10_avg": 0.65,
+  "precision": 0.0,
+  "recall": 0.0,
+  "f1": 0.0,
+  "confusion_matrix [[TN,FP],[FN,TP]]": [
+    [
+      287,
+      0
+    ],
+    [
+      213,
+      0
+    ]
+  ]
+}
