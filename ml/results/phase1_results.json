@@ -1,0 +1,146 @@
+[
+  {
+    "model": "majority-class",
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "pr_auc": 0.4274,
+    "roc_auc": 0.5,
+    "confusion_matrix [[TN,FP],[FN,TP]]": [
+      [
+        2082,
+        0
+      ],
+      [
+        1554,
+        0
+      ]
+    ],
+    "per_category_recall": {
+      "sql_injection": {
+        "n_vulnerable_in_test": 576,
+        "recall": 0.0
+      },
+      "xss": {
+        "n_vulnerable_in_test": 127,
+        "recall": 0.0
+      },
+      "secrets": {
+        "n_vulnerable_in_test": 0,
+        "recall": null
+      },
+      "auth": {
+        "n_vulnerable_in_test": 30,
+        "recall": 0.0
+      }
+    }
+  },
+  {
+    "model": "length-only LR",
+    "precision": 0.4647,
+    "recall": 0.1229,
+    "f1": 0.1944,
+    "pr_auc": 0.4394,
+    "roc_auc": 0.5032,
+    "confusion_matrix [[TN,FP],[FN,TP]]": [
+      [
+        1862,
+        220
+      ],
+      [
+        1363,
+        191
+      ]
+    ],
+    "per_category_recall": {
+      "sql_injection": {
+        "n_vulnerable_in_test": 576,
+        "recall": 0.1406
+      },
+      "xss": {
+        "n_vulnerable_in_test": 127,
+        "recall": 0.0315
+      },
+      "secrets": {
+        "n_vulnerable_in_test": 0,
+        "recall": null
+      },
+      "auth": {
+        "n_vulnerable_in_test": 30,
+        "recall": 0.0
+      }
+    }
+  },
+  {
+    "model": "TF-IDF + Logistic Regression",
+    "precision": 0.4732,
+    "recall": 0.2555,
+    "f1": 0.3318,
+    "pr_auc": 0.4556,
+    "roc_auc": 0.5279,
+    "confusion_matrix [[TN,FP],[FN,TP]]": [
+      [
+        1640,
+        442
+      ],
+      [
+        1157,
+        397
+      ]
+    ],
+    "per_category_recall": {
+      "sql_injection": {
+        "n_vulnerable_in_test": 576,
+        "recall": 0.2986
+      },
+      "xss": {
+        "n_vulnerable_in_test": 127,
+        "recall": 0.4094
+      },
+      "secrets": {
+        "n_vulnerable_in_test": 0,
+        "recall": null
+      },
+      "auth": {
+        "n_vulnerable_in_test": 30,
+        "recall": 0.3667
+      }
+    }
+  },
+  {
+    "model": "TF-IDF + Random Forest",
+    "precision": 0.4965,
+    "recall": 0.0457,
+    "f1": 0.0837,
+    "pr_auc": 0.4544,
+    "roc_auc": 0.5304,
+    "confusion_matrix [[TN,FP],[FN,TP]]": [
+      [
+        2010,
+        72
+      ],
+      [
+        1483,
+        71
+      ]
+    ],
+    "per_category_recall": {
+      "sql_injection": {
+        "n_vulnerable_in_test": 576,
+        "recall": 0.0694
+      },
+      "xss": {
+        "n_vulnerable_in_test": 127,
+        "recall": 0.0787
+      },
+      "secrets": {
+        "n_vulnerable_in_test": 0,
+        "recall": null
+      },
+      "auth": {
+        "n_vulnerable_in_test": 30,
+        "recall": 0.0
+      }
+    }
+  }
+]
