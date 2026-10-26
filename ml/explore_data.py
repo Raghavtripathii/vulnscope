@@ -1,13 +1,12 @@
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parent / "data" / "raw" / "CVEfixes.db"
+DB_PATH = Path("D:/vulnscope-data/raw/CVEfixes.db")
 
 
 def main():
     if not DB_PATH.exists():
         print(f"Database not found at {DB_PATH}")
-        print("Download it first and place it at ml/data/raw/CVEfixes.db")
         return
 
     conn = sqlite3.connect(DB_PATH)
