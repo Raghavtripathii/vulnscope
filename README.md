@@ -35,7 +35,7 @@ vulnscope/
 
 ## Status
 
-Phase 0 — foundations.
+Phase 1 complete — rule-based detection, auth, Docker, frontend, and classical ML baseline all working. CodeBERT sanity check passed. Starting Phase 2 (CodeBERT fine-tuning).
 
 ## License
 
