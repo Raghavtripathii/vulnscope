@@ -9,5 +9,5 @@
     "sourceType": "module"
   },
   "plugins": ["security"],
-  "extends": ["plugin:security/recommended"]
+  "extends": ["plugin:security/recommended-legacy"]
 }
