@@ -1,0 +1,84 @@
+{
+  "n_repos": 192,
+  "n_rows": 3636,
+  "resamples_used": 2000,
+  "models": {
+    "codebert": {
+      "roc_auc": 0.5495,
+      "roc_auc_ci95": [
+        0.5315,
+        0.5885
+      ],
+      "share_of_resamples_roc_auc_at_or_below_0.5": 0.0,
+      "pr_auc": 0.4648,
+      "pr_auc_ci95": [
+        0.4371,
+        0.4848
+      ]
+    },
+    "lr": {
+      "roc_auc": 0.5279,
+      "roc_auc_ci95": [
+        0.5075,
+        0.5626
+      ],
+      "share_of_resamples_roc_auc_at_or_below_0.5": 0.007,
+      "pr_auc": 0.4556,
+      "pr_auc_ci95": [
+        0.4327,
+        0.4752
+      ]
+    },
+    "rf": {
+      "roc_auc": 0.5304,
+      "roc_auc_ci95": [
+        0.5138,
+        0.5653
+      ],
+      "share_of_resamples_roc_auc_at_or_below_0.5": 0.0,
+      "pr_auc": 0.4544,
+      "pr_auc_ci95": [
+        0.4326,
+        0.4758
+      ]
+    }
+  },
+  "paired": {
+    "codebert_minus_lr": {
+      "roc_auc": {
+        "difference": 0.0216,
+        "ci95": [
+          0.0018,
+          0.0554
+        ],
+        "share_of_resamples_codebert_better": 0.9815
+      },
+      "pr_auc": {
+        "difference": 0.0091,
+        "ci95": [
+          -0.0124,
+          0.0268
+        ],
+        "share_of_resamples_codebert_better": 0.861
+      }
+    },
+    "codebert_minus_rf": {
+      "roc_auc": {
+        "difference": 0.0191,
+        "ci95": [
+          -0.0003,
+          0.0385
+        ],
+        "share_of_resamples_codebert_better": 0.974
+      },
+      "pr_auc": {
+        "difference": 0.0104,
+        "ci95": [
+          -0.0125,
+          0.0261
+        ],
+        "share_of_resamples_codebert_better": 0.8495
+      }
+    }
+  }
+}
