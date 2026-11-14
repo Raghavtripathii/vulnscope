@@ -1,12 +1,29 @@
 import json
+import logging
 import subprocess
 from pathlib import Path
 
 from app.config import settings
 
+logger = logging.getLogger(__name__)
+
 SEMGREP_RULESETS = ["p/security-audit", "p/owasp-top-ten"]
 
 SEVERITY_MAP = {"ERROR": "high", "WARNING": "medium", "INFO": "low"}
+
+HIDDEN_LINES_MARKER = "requires login"
+
+
+def read_source_line(file_path: Path, line_number: int | None) -> str | None:
+    if not line_number:
+        return None
+    try:
+        source_lines = file_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+    if 1 <= line_number <= len(source_lines):
+        return source_lines[line_number - 1].strip()
+    return None
 
 
 def run_semgrep(file_path: Path) -> list[dict]:
@@ -16,20 +33,26 @@ def run_semgrep(file_path: Path) -> list[dict]:
 
     try:
         result = subprocess.run(
-            ["semgrep", *config_args, "--json", "--quiet", str(file_path)],
+            ["semgrep", *config_args, "--metrics=off", "--json", "--quiet", str(file_path)],
             capture_output=True,
             text=True,
             timeout=settings.semgrep_timeout_seconds,
         )
-    except (subprocess.TimeoutExpired, FileNotFoundError):
+    except subprocess.TimeoutExpired:
+        logger.warning("semgrep timed out after %s seconds", settings.semgrep_timeout_seconds)
+        return []
+    except FileNotFoundError:
+        logger.error("semgrep executable not found")
         return []
 
     if not result.stdout:
+        logger.warning("semgrep returned no output, exit code %s, stderr: %s", result.returncode, result.stderr[:300])
         return []
 
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
+        logger.warning("semgrep output was not valid json")
         return []
 
     findings = []
@@ -38,7 +61,13 @@ def run_semgrep(file_path: Path) -> list[dict]:
         metadata = extra.get("metadata", {})
         cwe_list = metadata.get("cwe") or []
         vulnerability_type = cwe_list[0] if cwe_list else item.get("check_id", "unknown")
+        line_number = item.get("start", {}).get("line")
         lines = extra.get("lines")
+
+        if lines and lines.strip() != HIDDEN_LINES_MARKER:
+            snippet = lines.strip()
+        else:
+            snippet = read_source_line(file_path, line_number)
 
         findings.append(
             {
@@ -46,9 +75,9 @@ def run_semgrep(file_path: Path) -> list[dict]:
                 "rule_id": item.get("check_id"),
                 "vulnerability_type": vulnerability_type,
                 "severity": SEVERITY_MAP.get(extra.get("severity"), "medium"),
-                "line_number": item.get("start", {}).get("line"),
+                "line_number": line_number,
                 "message": extra.get("message", ""),
-                "code_snippet": lines.strip() if lines else None,
+                "code_snippet": snippet,
             }
         )
     return findings
