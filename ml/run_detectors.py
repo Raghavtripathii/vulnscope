@@ -3,7 +3,9 @@ import json
 import shutil
 import subprocess
 import sys
+import textwrap
 import time
+from collections import Counter
 from pathlib import Path
 
 csv.field_size_limit(sys.maxsize)
@@ -60,15 +62,19 @@ def eslint_dir(lang_dir):
     payload = json.loads(run(cmd).stdout)
     scanned = set()
     hits = {}
+    failures = Counter()
     for file_result in payload:
         idx = index_of(file_result["filePath"])
         messages = file_result["messages"]
-        if any(m.get("fatal") for m in messages):
+        fatal = [m for m in messages if m.get("fatal")]
+        if fatal:
+            failures[fatal[0]["message"][:70]] += 1
             continue
         scanned.add(idx)
         rules = [m["ruleId"] for m in messages if m.get("ruleId")]
         if rules:
             hits[idx] = rules
+    print("eslint parse failures:", failures.most_common(5))
     return scanned, hits
 
 
@@ -86,7 +92,7 @@ def main(in_path, out_path):
         (WORK / lang).mkdir(parents=True)
     for i, row in enumerate(rows):
         target = WORK / row["lang"] / f"{i:05d}{EXTENSIONS[row['lang']]}"
-        target.write_text(row["code"], encoding="utf-8", newline="")
+        target.write_text(textwrap.dedent(row["code"]), encoding="utf-8", newline="")
     print(f"wrote {len(rows)} functions")
 
     results = {
