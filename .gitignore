@@ -26,6 +26,7 @@ build/
 *.pt
 *.onnx
 *.bin
+*.safetensors
 mlruns/
 wandb/
 ml/data/raw/
