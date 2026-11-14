@@ -1,0 +1,398 @@
+{
+  "views": {
+    "All test functions": {
+      "Semgrep": {
+        "n": 3636,
+        "vulnerable": 1554,
+        "flagged": 45,
+        "precision": 0.5777777777777777,
+        "recall": 0.01673101673101673,
+        "f1": 0.032520325203252036,
+        "balanced_acc": 0.5038025880965362,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Bandit / ESLint": {
+        "n": 3636,
+        "vulnerable": 1554,
+        "flagged": 656,
+        "precision": 0.43597560975609756,
+        "recall": 0.18404118404118405,
+        "f1": 0.25882352941176473,
+        "balanced_acc": 0.5031637236248188,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Rules combined (any finding)": {
+        "n": 3636,
+        "vulnerable": 1554,
+        "flagged": 689,
+        "precision": 0.4426705370101596,
+        "recall": 0.19626769626769627,
+        "f1": 0.2719572001783326,
+        "balanced_acc": 0.5059148279609375,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "TF-IDF + LR": {
+        "n": 3636,
+        "vulnerable": 1554,
+        "flagged": 839,
+        "precision": 0.4731823599523242,
+        "recall": 0.2554697554697555,
+        "f1": 0.3318010865022984,
+        "balanced_acc": 0.5215869430566837,
+        "pr_auc": 0.45564791452926584,
+        "roc_auc": 0.5279105268298352
+      },
+      "TF-IDF + RF": {
+        "n": 3636,
+        "vulnerable": 1554,
+        "flagged": 143,
+        "precision": 0.4965034965034965,
+        "recall": 0.04568854568854569,
+        "f1": 0.08367707719505009,
+        "balanced_acc": 0.5055532065618521,
+        "pr_auc": 0.45436964864732293,
+        "roc_auc": 0.5304322952017476
+      },
+      "CodeBERT": {
+        "n": 3636,
+        "vulnerable": 1554,
+        "flagged": 1190,
+        "precision": 0.47478991596638653,
+        "recall": 0.3635778635778636,
+        "f1": 0.41180758017492713,
+        "balanced_acc": 0.531692870309585,
+        "pr_auc": 0.46479241668261884,
+        "roc_auc": 0.5495388863544484
+      }
+    },
+    "Parsed by every applicable rule tool": {
+      "Semgrep": {
+        "n": 2541,
+        "vulnerable": 1079,
+        "flagged": 19,
+        "precision": 0.5789473684210527,
+        "recall": 0.010194624652455977,
+        "f1": 0.020036429872495445,
+        "balanced_acc": 0.5023613342140528,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Bandit / ESLint": {
+        "n": 2541,
+        "vulnerable": 1079,
+        "flagged": 656,
+        "precision": 0.43597560975609756,
+        "recall": 0.26506024096385544,
+        "f1": 0.32968299711815563,
+        "balanced_acc": 0.5059911327938292,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Rules combined (any finding)": {
+        "n": 2541,
+        "vulnerable": 1079,
+        "flagged": 663,
+        "precision": 0.4374057315233786,
+        "recall": 0.26876737720111216,
+        "f1": 0.33295063145809417,
+        "balanced_acc": 0.506818709120392,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "TF-IDF + LR": {
+        "n": 2541,
+        "vulnerable": 1079,
+        "flagged": 553,
+        "precision": 0.488245931283906,
+        "recall": 0.25023169601482853,
+        "f1": 0.33088235294117646,
+        "balanced_acc": 0.52833062228922,
+        "pr_auc": 0.460785666102047,
+        "roc_auc": 0.53587611521536
+      },
+      "TF-IDF + RF": {
+        "n": 2541,
+        "vulnerable": 1079,
+        "flagged": 95,
+        "precision": 0.49473684210526314,
+        "recall": 0.04355885078776645,
+        "f1": 0.08006814310051108,
+        "balanced_acc": 0.5053635567208327,
+        "pr_auc": 0.4586275771470597,
+        "roc_auc": 0.5438380904444887
+      },
+      "CodeBERT": {
+        "n": 2541,
+        "vulnerable": 1079,
+        "flagged": 875,
+        "precision": 0.48114285714285715,
+        "recall": 0.3901760889712697,
+        "f1": 0.43091095189355166,
+        "balanced_acc": 0.5398212866196977,
+        "pr_auc": 0.47049948194554425,
+        "roc_auc": 0.5604758294463764
+      }
+    },
+    "In-scope classes only (sql_injection, xss, auth)": {
+      "Semgrep": {
+        "n": 1679,
+        "vulnerable": 733,
+        "flagged": 5,
+        "precision": 0.8,
+        "recall": 0.005457025920873124,
+        "f1": 0.01084010840108401,
+        "balanced_acc": 0.5021999717342209,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Bandit / ESLint": {
+        "n": 1679,
+        "vulnerable": 733,
+        "flagged": 257,
+        "precision": 0.45525291828793774,
+        "recall": 0.15961800818553887,
+        "f1": 0.23636363636363636,
+        "balanced_acc": 0.5058132324225791,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Rules combined (any finding)": {
+        "n": 1679,
+        "vulnerable": 733,
+        "flagged": 260,
+        "precision": 0.46153846153846156,
+        "recall": 0.16371077762619374,
+        "f1": 0.24169184290030213,
+        "balanced_acc": 0.5078596171429066,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "TF-IDF + LR": {
+        "n": 1679,
+        "vulnerable": 733,
+        "flagged": 502,
+        "precision": 0.4681274900398406,
+        "recall": 0.32060027285129605,
+        "f1": 0.3805668016194332,
+        "balanced_acc": 0.5191796290260708,
+        "pr_auc": 0.4707029178431745,
+        "roc_auc": 0.5368832363740197
+      },
+      "TF-IDF + RF": {
+        "n": 1679,
+        "vulnerable": 733,
+        "flagged": 100,
+        "precision": 0.5,
+        "recall": 0.06821282401091405,
+        "f1": 0.12004801920768307,
+        "balanced_acc": 0.5076793506946747,
+        "pr_auc": 0.46559013402887073,
+        "roc_auc": 0.5290488565338656
+      },
+      "CodeBERT": {
+        "n": 1679,
+        "vulnerable": 733,
+        "flagged": 681,
+        "precision": 0.47283406754772395,
+        "recall": 0.4392905866302865,
+        "f1": 0.45544554455445546,
+        "balanced_acc": 0.5298989931037268,
+        "pr_auc": 0.4735489126968055,
+        "roc_auc": 0.545905211575125
+      }
+    },
+    "In-scope and parsed": {
+      "Semgrep": {
+        "n": 968,
+        "vulnerable": 426,
+        "flagged": 2,
+        "precision": 0.5,
+        "recall": 0.002347417840375587,
+        "f1": 0.004672897196261682,
+        "balanced_acc": 0.5002511996950956,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Bandit / ESLint": {
+        "n": 968,
+        "vulnerable": 426,
+        "flagged": 257,
+        "precision": 0.45525291828793774,
+        "recall": 0.2746478873239437,
+        "f1": 0.34260614934114203,
+        "balanced_acc": 0.5081726521490567,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "Rules combined (any finding)": {
+        "n": 968,
+        "vulnerable": 426,
+        "flagged": 257,
+        "precision": 0.45525291828793774,
+        "recall": 0.2746478873239437,
+        "f1": 0.34260614934114203,
+        "balanced_acc": 0.5081726521490567,
+        "pr_auc": null,
+        "roc_auc": null
+      },
+      "TF-IDF + LR": {
+        "n": 968,
+        "vulnerable": 426,
+        "flagged": 282,
+        "precision": 0.4929078014184397,
+        "recall": 0.32629107981220656,
+        "f1": 0.3926553672316384,
+        "balanced_acc": 0.5312267207179114,
+        "pr_auc": 0.48941488038242836,
+        "roc_auc": 0.5575767025275887
+      },
+      "TF-IDF + RF": {
+        "n": 968,
+        "vulnerable": 426,
+        "flagged": 63,
+        "precision": 0.49206349206349204,
+        "recall": 0.07276995305164319,
+        "f1": 0.12678936605316973,
+        "balanced_acc": 0.5068646813228695,
+        "pr_auc": 0.4813890954758372,
+        "roc_auc": 0.5553938637977929
+      },
+      "CodeBERT": {
+        "n": 968,
+        "vulnerable": 426,
+        "flagged": 454,
+        "precision": 0.4889867841409692,
+        "recall": 0.5211267605633803,
+        "f1": 0.5045454545454545,
+        "balanced_acc": 0.5465412400602879,
+        "pr_auc": 0.49067802776091296,
+        "roc_auc": 0.5620896349808568
+      }
+    }
+  },
+  "per_category": {
+    "Semgrep": {
+      "sql_injection": {
+        "vulnerable": 576,
+        "fixed": 718,
+        "recall": 0.005208333333333333,
+        "false_alarm_rate": 0.0
+      },
+      "xss": {
+        "vulnerable": 127,
+        "fixed": 191,
+        "recall": 0.007874015748031496,
+        "false_alarm_rate": 0.005235602094240838
+      },
+      "auth": {
+        "vulnerable": 30,
+        "fixed": 37,
+        "recall": 0.0,
+        "false_alarm_rate": 0.0
+      }
+    },
+    "Bandit / ESLint": {
+      "sql_injection": {
+        "vulnerable": 576,
+        "fixed": 718,
+        "recall": 0.15104166666666666,
+        "false_alarm_rate": 0.13370473537604458
+      },
+      "xss": {
+        "vulnerable": 127,
+        "fixed": 191,
+        "recall": 0.16535433070866143,
+        "false_alarm_rate": 0.17277486910994763
+      },
+      "auth": {
+        "vulnerable": 30,
+        "fixed": 37,
+        "recall": 0.3,
+        "false_alarm_rate": 0.2972972972972973
+      }
+    },
+    "Rules combined (any finding)": {
+      "sql_injection": {
+        "vulnerable": 576,
+        "fixed": 718,
+        "recall": 0.15625,
+        "false_alarm_rate": 0.13370473537604458
+      },
+      "xss": {
+        "vulnerable": 127,
+        "fixed": 191,
+        "recall": 0.16535433070866143,
+        "false_alarm_rate": 0.17277486910994763
+      },
+      "auth": {
+        "vulnerable": 30,
+        "fixed": 37,
+        "recall": 0.3,
+        "false_alarm_rate": 0.2972972972972973
+      }
+    },
+    "TF-IDF + LR": {
+      "sql_injection": {
+        "vulnerable": 576,
+        "fixed": 718,
+        "recall": 0.2986111111111111,
+        "false_alarm_rate": 0.28133704735376047
+      },
+      "xss": {
+        "vulnerable": 127,
+        "fixed": 191,
+        "recall": 0.4094488188976378,
+        "false_alarm_rate": 0.27225130890052357
+      },
+      "auth": {
+        "vulnerable": 30,
+        "fixed": 37,
+        "recall": 0.36666666666666664,
+        "false_alarm_rate": 0.35135135135135137
+      }
+    },
+    "TF-IDF + RF": {
+      "sql_injection": {
+        "vulnerable": 576,
+        "fixed": 718,
+        "recall": 0.06944444444444445,
+        "false_alarm_rate": 0.055710306406685235
+      },
+      "xss": {
+        "vulnerable": 127,
+        "fixed": 191,
+        "recall": 0.07874015748031496,
+        "false_alarm_rate": 0.04712041884816754
+      },
+      "auth": {
+        "vulnerable": 30,
+        "fixed": 37,
+        "recall": 0.0,
+        "false_alarm_rate": 0.02702702702702703
+      }
+    },
+    "CodeBERT": {
+      "sql_injection": {
+        "vulnerable": 576,
+        "fixed": 718,
+        "recall": 0.4548611111111111,
+        "false_alarm_rate": 0.41643454038997213
+      },
+      "xss": {
+        "vulnerable": 127,
+        "fixed": 191,
+        "recall": 0.4094488188976378,
+        "false_alarm_rate": 0.27225130890052357
+      },
+      "auth": {
+        "vulnerable": 30,
+        "fixed": 37,
+        "recall": 0.26666666666666666,
+        "false_alarm_rate": 0.21621621621621623
+      }
+    }
+  }
+}
