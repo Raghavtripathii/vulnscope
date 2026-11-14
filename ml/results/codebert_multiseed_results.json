@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "model_name": "microsoft/codebert-base",
+    "max_len": 256,
+    "batch_size": 16,
+    "epochs": 3,
+    "learning_rate": 2e-05,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "val_folds": 5,
+    "n_fit": 10039,
+    "n_val": 2510,
+    "n_test": 3114,
+    "gpu": "Tesla T4",
+    "best_seed_by_validation": 45
+  },
+  "per_seed": [
+    {
+      "seed": 42,
+      "best_epoch": 3,
+      "val_pr_auc": 0.2578,
+      "train_seconds": 457.4,
+      "precision": 0.4824,
+      "recall": 0.2713,
+      "f1": 0.3473,
+      "pr_auc": 0.4717,
+      "roc_auc": 0.5689
+    },
+    {
+      "seed": 43,
+      "best_epoch": 1,
+      "val_pr_auc": 0.2611,
+      "train_seconds": 455.8,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.4549,
+      "roc_auc": 0.5544
+    },
+    {
+      "seed": 44,
+      "best_epoch": 3,
+      "val_pr_auc": 0.271,
+      "train_seconds": 456.3,
+      "precision": 0.4782,
+      "recall": 0.3078,
+      "f1": 0.3745,
+      "pr_auc": 0.4698,
+      "roc_auc": 0.5673
+    },
+    {
+      "seed": 45,
+      "best_epoch": 1,
+      "val_pr_auc": 0.3007,
+      "train_seconds": 456.5,
+      "precision": 0.4524,
+      "recall": 0.2204,
+      "f1": 0.2964,
+      "pr_auc": 0.4546,
+      "roc_auc": 0.543
+    },
+    {
+      "seed": 46,
+      "best_epoch": 1,
+      "val_pr_auc": 0.2877,
+      "train_seconds": 455.7,
+      "precision": 0.4306,
+      "recall": 0.0236,
+      "f1": 0.0447,
+      "pr_auc": 0.4628,
+      "roc_auc": 0.5622
+    }
+  ],
+  "aggregate": {
+    "roc_auc": {
+      "mean": 0.5592,
+      "min": 0.543,
+      "max": 0.5689
+    },
+    "pr_auc": {
+      "mean": 0.4628,
+      "min": 0.4546,
+      "max": 0.4717
+    },
+    "precision": {
+      "mean": 0.3687,
+      "min": 0.0,
+      "max": 0.4824
+    },
+    "recall": {
+      "mean": 0.1646,
+      "min": 0.0,
+      "max": 0.3078
+    },
+    "f1": {
+      "mean": 0.2126,
+      "min": 0.0,
+      "max": 0.3745
+    }
+  },
+  "seed_ensemble": {
+    "precision": 0.4798,
+    "recall": 0.1535,
+    "f1": 0.2326,
+    "pr_auc": 0.4687,
+    "roc_auc": 0.5702
+  },
+  "test_base_rate": 0.4226
+}
