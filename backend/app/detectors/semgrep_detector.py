@@ -43,8 +43,8 @@ def run_semgrep(file_path: Path) -> list[dict]:
     except subprocess.TimeoutExpired:
         logger.warning("semgrep timed out after %s seconds", settings.semgrep_timeout_seconds)
         return []
-    except FileNotFoundError:
-        logger.error("semgrep executable not found")
+    except OSError as error:
+        logger.error("could not start semgrep: %s", error)
         return []
 
     if not result.stdout:
