@@ -1,8 +1,11 @@
 import json
+import logging
 import subprocess
 from pathlib import Path
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 SEVERITY_MAP = {"HIGH": "high", "MEDIUM": "medium", "LOW": "low"}
 
@@ -15,16 +18,25 @@ def run_bandit(file_path: Path) -> list[dict]:
             text=True,
             timeout=settings.bandit_timeout_seconds,
         )
-    except (subprocess.TimeoutExpired, FileNotFoundError):
+    except subprocess.TimeoutExpired:
+        logger.warning("bandit timed out after %s seconds", settings.bandit_timeout_seconds)
+        return []
+    except OSError as error:
+        logger.error("could not start bandit: %s", error)
         return []
 
     if not result.stdout:
+        logger.warning("bandit returned no output, exit code %s, stderr: %s", result.returncode, result.stderr[:300])
         return []
 
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
+        logger.warning("bandit output was not valid json")
         return []
+
+    for error in payload.get("errors", []):
+        logger.warning("bandit reported an error: %s", error)
 
     findings = []
     for item in payload.get("results", []):
