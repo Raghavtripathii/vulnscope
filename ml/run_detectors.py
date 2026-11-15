@@ -30,9 +30,9 @@ def run(cmd):
     return proc
 
 
-def semgrep_dir(lang_dir):
+def semgrep_dir(lang_dir, extra_configs):
     cmd = ["semgrep"]
-    for config in SEMGREP_CONFIGS:
+    for config in SEMGREP_CONFIGS + extra_configs:
         cmd += ["--config", config]
     cmd += ["--metrics=off", "--json", "--quiet", str(lang_dir)]
     payload = json.loads(run(cmd).stdout)
@@ -78,7 +78,7 @@ def eslint_dir(lang_dir):
     return scanned, hits
 
 
-def main(in_path, out_path):
+def main(in_path, out_path, extra_configs):
     with open(in_path, newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
 
@@ -94,10 +94,11 @@ def main(in_path, out_path):
         target = WORK / row["lang"] / f"{i:05d}{EXTENSIONS[row['lang']]}"
         target.write_text(textwrap.dedent(row["code"]), encoding="utf-8", newline="")
     print(f"wrote {len(rows)} functions")
+    print("semgrep configs:", SEMGREP_CONFIGS + extra_configs)
 
     results = {
-        "semgrep_python": semgrep_dir(WORK / "python"),
-        "semgrep_javascript": semgrep_dir(WORK / "javascript"),
+        "semgrep_python": semgrep_dir(WORK / "python", extra_configs),
+        "semgrep_javascript": semgrep_dir(WORK / "javascript", extra_configs),
         "bandit": bandit_dir(WORK / "python"),
         "eslint": eslint_dir(WORK / "javascript"),
     }
@@ -140,4 +141,5 @@ def main(in_path, out_path):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    extra = sys.argv[3].split(",") if len(sys.argv) > 3 else []
+    main(sys.argv[1], sys.argv[2], extra)
