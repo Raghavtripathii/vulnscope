@@ -1,0 +1,53 @@
+rules:
+  - id: vulnscope-hardcoded-secret-python
+    languages: [python]
+    severity: WARNING
+    message: A credential-like variable is assigned a hardcoded string. Load secrets from environment variables or a secret manager instead.
+    patterns:
+      - pattern: $VAR = $STR
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: (?i).*(api_?key|secret|token|passw(or)?d|pwd|private_?key|access_?key).*
+      - metavariable-regex:
+          metavariable: $STR
+          regex: ^[rbuRBU]{0,2}(["'])[^"']{8,}\1$
+    metadata:
+      cwe:
+        - "CWE-798: Use of Hard-coded Credentials"
+      category: security
+  - id: vulnscope-hardcoded-secret-javascript
+    languages: [javascript]
+    severity: WARNING
+    message: A credential-like variable is assigned a hardcoded string. Load secrets from environment variables or a secret manager instead.
+    patterns:
+      - pattern: $VAR = $STR
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: (?i).*(api_?key|secret|token|passw(or)?d|pwd|private_?key|access_?key).*
+      - metavariable-regex:
+          metavariable: $STR
+          regex: ^(["'`])[^"'`$]{8,}\1$
+    metadata:
+      cwe:
+        - "CWE-798: Use of Hard-coded Credentials"
+      category: security
+  - id: vulnscope-xss-html-sink
+    languages: [javascript]
+    severity: WARNING
+    message: A non-literal value is written into the page as HTML. If it can contain user input this is cross-site scripting. Use textContent or sanitize the value first.
+    patterns:
+      - pattern-either:
+          - pattern: $EL.innerHTML = $VAL
+          - pattern: $EL.outerHTML = $VAL
+          - pattern: document.write($VAL)
+          - pattern: document.writeln($VAL)
+          - pattern: $EL.insertAdjacentHTML($POS, $VAL)
+      - pattern-not: $EL.innerHTML = "..."
+      - pattern-not: $EL.outerHTML = "..."
+      - pattern-not: document.write("...")
+      - pattern-not: document.writeln("...")
+      - pattern-not: $EL.insertAdjacentHTML($POS, "...")
+    metadata:
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      category: security
