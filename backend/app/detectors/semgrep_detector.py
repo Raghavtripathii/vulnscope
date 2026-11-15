@@ -7,7 +7,9 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-SEMGREP_RULESETS = ["p/security-audit", "p/owasp-top-ten"]
+CUSTOM_RULES_FILE = Path(__file__).resolve().parent / "semgrep-rules" / "vulnscope.yml"
+
+SEMGREP_RULESETS = ["p/security-audit", "p/owasp-top-ten", "p/secrets", str(CUSTOM_RULES_FILE)]
 
 SEVERITY_MAP = {"ERROR": "high", "WARNING": "medium", "INFO": "low"}
 
@@ -60,6 +62,8 @@ def run_semgrep(file_path: Path) -> list[dict]:
         extra = item.get("extra", {})
         metadata = extra.get("metadata", {})
         cwe_list = metadata.get("cwe") or []
+        if isinstance(cwe_list, str):
+            cwe_list = [cwe_list]
         vulnerability_type = cwe_list[0] if cwe_list else item.get("check_id", "unknown")
         line_number = item.get("start", {}).get("line")
         lines = extra.get("lines")
