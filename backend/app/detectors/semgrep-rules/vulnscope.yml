@@ -51,3 +51,51 @@ rules:
       cwe:
         - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
       category: security
+  - id: vulnscope-sqli-python
+    languages: [python]
+    severity: ERROR
+    message: A SQL query is built by joining strings with a variable. If the variable can contain user input this is SQL injection. Pass values as query parameters instead of building the string.
+    patterns:
+      - pattern: $DB.$METHOD($ARG, ...)
+      - metavariable-regex:
+          metavariable: $METHOD
+          regex: ^(execute|executemany|executescript|raw|read_sql|read_sql_query)$
+      - metavariable-regex:
+          metavariable: $ARG
+          regex: (?is).*\b(select|insert|update|delete|drop|alter|create|replace|where|values)\b.*
+      - metavariable-pattern:
+          metavariable: $ARG
+          patterns:
+            - pattern-either:
+                - pattern: 'f"...{$X}..."'
+                - pattern: $A + $B
+                - pattern: $A % $B
+                - pattern: '"...".format(...)'
+            - pattern-not: '"..." + "..."'
+    metadata:
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      category: security
+  - id: vulnscope-sqli-javascript
+    languages: [javascript]
+    severity: ERROR
+    message: A SQL query is built by joining strings or interpolating a variable. If the value can contain user input this is SQL injection. Pass values as query parameters instead of building the string.
+    patterns:
+      - pattern: $DB.$METHOD($ARG, ...)
+      - metavariable-regex:
+          metavariable: $METHOD
+          regex: ^(query|execute|run|all|each|raw|exec)$
+      - metavariable-regex:
+          metavariable: $ARG
+          regex: (?is).*\b(select|insert|update|delete|drop|alter|create|replace|where|values)\b.*
+      - metavariable-pattern:
+          metavariable: $ARG
+          patterns:
+            - pattern-either:
+                - pattern: '`...${$X}...`'
+                - pattern: $A + $B
+            - pattern-not: '"..." + "..."'
+    metadata:
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      category: security
