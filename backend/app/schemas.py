@@ -1,3 +1,4 @@
+import datetime
 from typing import Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field
@@ -63,3 +64,27 @@ class IssueResponse(BaseModel):
     severity: str
     code_snippet: Optional[str]
     detectors: list[str]
+
+
+class ScanSummary(BaseModel):
+    scan_id: int
+    language: str
+    filename: Optional[str]
+    created_at: datetime.datetime
+    issue_count: int
+    issues_by_class: dict[str, int]
+
+
+class RepeatedMistake(BaseModel):
+    vulnerability_class: str
+    label: str
+    scans_affected: int
+    issues_total: int
+    last_seen: Optional[datetime.datetime]
+
+
+class StatsResponse(BaseModel):
+    scans_count: int
+    issues_total: int
+    issues_by_class: dict[str, int]
+    repeated_mistakes: list[RepeatedMistake]
