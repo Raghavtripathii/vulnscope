@@ -44,6 +44,8 @@ class ScanResponse(BaseModel):
     scan_id: int
     language: str
     findings: list[FindingResponse]
+    detectors: dict[str, str] = {}
+    complete: bool = True
 
 
 class ExplainRequest(BaseModel):
