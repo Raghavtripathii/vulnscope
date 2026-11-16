@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 from app.config import settings
+from app.detectors.result import DetectorFindings
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def read_source_line(file_path: Path, line_number: int | None) -> str | None:
     return None
 
 
-def run_semgrep(file_path: Path) -> list[dict]:
+def run_semgrep(file_path: Path) -> DetectorFindings:
     config_args = []
     for ruleset in SEMGREP_RULESETS:
         config_args += ["--config", ruleset]
@@ -42,22 +43,22 @@ def run_semgrep(file_path: Path) -> list[dict]:
         )
     except subprocess.TimeoutExpired:
         logger.warning("semgrep timed out after %s seconds", settings.semgrep_timeout_seconds)
-        return []
+        return DetectorFindings(status="timeout")
     except OSError as error:
         logger.error("could not start semgrep: %s", error)
-        return []
+        return DetectorFindings(status="unavailable")
 
     if not result.stdout:
         logger.warning("semgrep returned no output, exit code %s, stderr: %s", result.returncode, result.stderr[:300])
-        return []
+        return DetectorFindings(status="failed")
 
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
         logger.warning("semgrep output was not valid json")
-        return []
+        return DetectorFindings(status="failed")
 
-    findings = []
+    findings = DetectorFindings()
     for item in payload.get("results", []):
         extra = item.get("extra", {})
         metadata = extra.get("metadata", {})
