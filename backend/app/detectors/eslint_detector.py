@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 from app.config import settings
+from app.detectors.result import DetectorFindings
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def source_line(source_lines: list[str], line_number: int | None) -> str | None:
     return None
 
 
-def run_eslint(file_path: Path) -> list[dict]:
+def run_eslint(file_path: Path) -> DetectorFindings:
     try:
         result = subprocess.run(
             [
@@ -49,24 +50,24 @@ def run_eslint(file_path: Path) -> list[dict]:
         )
     except subprocess.TimeoutExpired:
         logger.warning("eslint timed out after %s seconds", settings.eslint_timeout_seconds)
-        return []
+        return DetectorFindings(status="timeout")
     except OSError as error:
         logger.error("could not start eslint: %s", error)
-        return []
+        return DetectorFindings(status="unavailable")
 
     if not result.stdout:
         logger.warning("eslint returned no output, exit code %s, stderr: %s", result.returncode, result.stderr[:300])
-        return []
+        return DetectorFindings(status="failed")
 
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
         logger.warning("eslint output was not valid json")
-        return []
+        return DetectorFindings(status="failed")
 
     source_lines = load_source_lines(file_path)
 
-    findings = []
+    findings = DetectorFindings()
     for file_result in payload:
         for msg in file_result.get("messages", []):
             if not msg.get("ruleId"):
