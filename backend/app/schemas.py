@@ -44,3 +44,20 @@ class ScanResponse(BaseModel):
     scan_id: int
     language: str
     findings: list[FindingResponse]
+
+
+class ExplainRequest(BaseModel):
+    scan_id: int
+    issue_index: int = Field(..., ge=0)
+
+
+class IssueResponse(BaseModel):
+    index: int
+    line_number: Optional[int]
+    vulnerability_class: str
+    label: str
+    cwe: Optional[str]
+    owasp: Optional[str]
+    severity: str
+    code_snippet: Optional[str]
+    detectors: list[str]
