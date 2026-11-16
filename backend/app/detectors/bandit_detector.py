@@ -4,13 +4,14 @@ import subprocess
 from pathlib import Path
 
 from app.config import settings
+from app.detectors.result import DetectorFindings
 
 logger = logging.getLogger(__name__)
 
 SEVERITY_MAP = {"HIGH": "high", "MEDIUM": "medium", "LOW": "low"}
 
 
-def run_bandit(file_path: Path) -> list[dict]:
+def run_bandit(file_path: Path) -> DetectorFindings:
     try:
         result = subprocess.run(
             ["bandit", "-f", "json", str(file_path)],
@@ -20,25 +21,25 @@ def run_bandit(file_path: Path) -> list[dict]:
         )
     except subprocess.TimeoutExpired:
         logger.warning("bandit timed out after %s seconds", settings.bandit_timeout_seconds)
-        return []
+        return DetectorFindings(status="timeout")
     except OSError as error:
         logger.error("could not start bandit: %s", error)
-        return []
+        return DetectorFindings(status="unavailable")
 
     if not result.stdout:
         logger.warning("bandit returned no output, exit code %s, stderr: %s", result.returncode, result.stderr[:300])
-        return []
+        return DetectorFindings(status="failed")
 
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
         logger.warning("bandit output was not valid json")
-        return []
+        return DetectorFindings(status="failed")
 
     for error in payload.get("errors", []):
         logger.warning("bandit reported an error: %s", error)
 
-    findings = []
+    findings = DetectorFindings()
     for item in payload.get("results", []):
         code = item.get("code")
         findings.append(
