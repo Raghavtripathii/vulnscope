@@ -22,3 +22,4 @@ class Explanation(BaseModel):
     fixed_code_example: str
     owasp_mapping: Optional[str] = None
     source: Literal["llm", "static"]
+    fix_rescan: Literal["clean", "not_checked"] = "not_checked"
