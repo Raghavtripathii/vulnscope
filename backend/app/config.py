@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 60 * 24 * 7
     gemini_api_key: SecretStr = SecretStr("")
     gemini_model: str = "gemini-3.5-flash-lite"
+    teacher_emails: str = ""
 
     class Config:
         env_file = ".env"
