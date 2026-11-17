@@ -9,8 +9,15 @@ from app.detectors.result import DetectorFindings
 logger = logging.getLogger(__name__)
 
 CUSTOM_RULES_FILE = Path(__file__).resolve().parent / "semgrep-rules" / "vulnscope.yml"
+AUTH_RULES_FILE = Path(__file__).resolve().parent / "semgrep-rules" / "vulnscope-auth.yml"
 
-SEMGREP_RULESETS = ["p/security-audit", "p/owasp-top-ten", "p/secrets", str(CUSTOM_RULES_FILE)]
+SEMGREP_RULESETS = [
+    "p/security-audit",
+    "p/owasp-top-ten",
+    "p/secrets",
+    str(CUSTOM_RULES_FILE),
+    str(AUTH_RULES_FILE),
+]
 
 SEVERITY_MAP = {"ERROR": "high", "WARNING": "medium", "INFO": "low"}
 
