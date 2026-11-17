@@ -88,3 +88,19 @@ class StatsResponse(BaseModel):
     issues_total: int
     issues_by_class: dict[str, int]
     repeated_mistakes: list[RepeatedMistake]
+
+
+class ClassStat(BaseModel):
+    vulnerability_class: str
+    label: str
+    issues_total: int
+    students_affected: int
+    students_repeating: int
+    share_of_students: float
+
+
+class TeacherStatsResponse(BaseModel):
+    students_count: int
+    scans_count: int
+    issues_total: int
+    classes: list[ClassStat]
