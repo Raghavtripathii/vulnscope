@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
-from app.routers import auth, explain, me, scan
+from app.routers import auth, explain, me, scan, teacher
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,6 +20,7 @@ app.include_router(scan.router)
 app.include_router(auth.router)
 app.include_router(explain.router)
 app.include_router(me.router)
+app.include_router(teacher.router)
 
 
 @app.get("/health")
