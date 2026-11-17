@@ -1,0 +1,12 @@
+rules:
+  - id: vulnscope-unverified-jwt-javascript
+    languages: [javascript]
+    severity: ERROR
+    message: A login token is decoded without checking its signature, so anyone can forge its contents. Use verify with the secret key and an allowed algorithm instead of decode.
+    pattern-either:
+      - pattern: jwt.decode(...)
+      - pattern: jsonwebtoken.decode(...)
+    metadata:
+      cwe:
+        - "CWE-287: Improper Authentication"
+      category: security
