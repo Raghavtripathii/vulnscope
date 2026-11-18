@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -44,3 +44,13 @@ class Finding(Base):
     code_snippet = Column(Text, nullable=True)
 
     scan = relationship("Scan", back_populates="findings")
+
+
+class ExerciseAttempt(Base):
+    __tablename__ = "exercise_attempts"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    exercise_id = Column(String, nullable=False, index=True)
+    passed = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
