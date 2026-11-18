@@ -4,19 +4,22 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { get, post } from "@/lib/api";
+import type { Me } from "@/types/auth";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [me, setMe] = useState<Me | null>(null);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     async function check() {
       try {
-        await get("/me/scans?limit=1");
-        setLoggedIn(true);
+        setMe(await get<Me>("/auth/me"));
       } catch {
-        setLoggedIn(false);
+        setMe(null);
+      } finally {
+        setChecked(true);
       }
     }
     check();
@@ -26,7 +29,7 @@ export default function Navbar() {
     try {
       await post("/auth/logout", {});
     } finally {
-      setLoggedIn(false);
+      setMe(null);
       router.push("/login");
     }
   }
@@ -40,7 +43,7 @@ export default function Navbar() {
         <Link href="/" className="hover:underline">
           Scan
         </Link>
-        {loggedIn && (
+        {me && (
           <>
             <Link href="/practice" className="hover:underline">
               Practice
@@ -48,15 +51,20 @@ export default function Navbar() {
             <Link href="/dashboard" className="hover:underline">
               Dashboard
             </Link>
-            <Link href="/teacher" className="hover:underline">
-              Teacher
-            </Link>
+            {me.is_teacher && (
+              <Link href="/teacher" className="hover:underline">
+                Teacher
+              </Link>
+            )}
+            <span className="text-neutral-400" title="Signed in as">
+              {me.email}
+            </span>
             <button onClick={handleLogout} className="hover:underline">
               Logout
             </button>
           </>
         )}
-        {loggedIn === false && (
+        {checked && !me && (
           <>
             <Link href="/login" className="hover:underline">
               Login
