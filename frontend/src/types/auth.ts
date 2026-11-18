@@ -12,3 +12,9 @@ export interface User {
   id: number;
   email: string;
 }
+
+export interface Me {
+  id: number;
+  email: string;
+  is_teacher: boolean;
+}
