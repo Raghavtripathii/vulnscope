@@ -40,6 +40,10 @@ class FindingResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class MeResponse(BaseModel):
+    id: int
+    email: str
+    is_teacher: bool
 
 class ScanResponse(BaseModel):
     scan_id: int
