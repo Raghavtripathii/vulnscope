@@ -1,10 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
-from app.auth import COOKIE_NAME, create_access_token, hash_password, verify_password
+from app.auth import (
+    COOKIE_NAME,
+    create_access_token,
+    hash_password,
+    verify_password,
+)
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserLogin, UserResponse
+from app.routers.explain import require_user_id
+from app.routers.teacher import teacher_email_set
+from app.schemas import MeResponse, UserCreate, UserLogin, UserResponse
 
 router = APIRouter(prefix="/auth")
 
@@ -50,3 +57,15 @@ def login(payload: UserLogin, response: Response, db: Session = Depends(get_db))
 @router.post("/logout", status_code=204)
 def logout(response: Response):
     response.delete_cookie(COOKIE_NAME)
+
+
+@router.get("/me", response_model=MeResponse)
+def me(db: Session = Depends(get_db), user_id: int = Depends(require_user_id)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="login required")
+    return MeResponse(
+        id=user.id,
+        email=user.email,
+        is_teacher=user.email.lower() in teacher_email_set(),
+    )
