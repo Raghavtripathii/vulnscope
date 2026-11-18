@@ -104,3 +104,58 @@ class TeacherStatsResponse(BaseModel):
     scans_count: int
     issues_total: int
     classes: list[ClassStat]
+
+
+class ExerciseSummary(BaseModel):
+    id: str
+    vulnerability_class: str
+    label: str
+    language: str
+    title: str
+    completed: bool
+
+
+class ExerciseDetail(ExerciseSummary):
+    scenario: str
+    vulnerable_code: str
+    hint: str
+
+
+class AttemptRequest(BaseModel):
+    code: str = Field(..., min_length=1)
+
+
+class RemainingIssue(BaseModel):
+    line_number: Optional[int]
+    vulnerability_class: str
+    label: str
+
+
+class AttemptResponse(BaseModel):
+    passed: bool
+    remaining: list[RemainingIssue]
+    detectors: dict[str, str]
+    reference_fix: Optional[str]
+
+
+class ExerciseProgress(BaseModel):
+    exercise_id: str
+    title: str
+    vulnerability_class: str
+    attempts: int
+    completed: bool
+    last_attempt_at: Optional[datetime.datetime]
+
+
+class ClassProgress(BaseModel):
+    vulnerability_class: str
+    label: str
+    total: int
+    completed: int
+
+
+class ProgressResponse(BaseModel):
+    exercises_total: int
+    exercises_completed: int
+    by_class: list[ClassProgress]
+    exercises: list[ExerciseProgress]
