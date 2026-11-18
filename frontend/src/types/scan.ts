@@ -20,4 +20,6 @@ export interface ScanResponse {
   scan_id: number;
   language: string;
   findings: Finding[];
+  detectors: Record<string, string>;
+  complete: boolean;
 }
