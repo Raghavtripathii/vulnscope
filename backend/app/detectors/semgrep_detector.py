@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import subprocess
 from pathlib import Path
 
@@ -8,16 +9,34 @@ from app.detectors.result import DetectorFindings
 
 logger = logging.getLogger(__name__)
 
-CUSTOM_RULES_FILE = Path(__file__).resolve().parent / "semgrep-rules" / "vulnscope.yml"
-AUTH_RULES_FILE = Path(__file__).resolve().parent / "semgrep-rules" / "vulnscope-auth.yml"
+# Semgrep checks for a newer version on every run. That network call can stall a scan
+# when the machine is offline or slow, so it is switched off for this process.
+os.environ.setdefault("SEMGREP_ENABLE_VERSION_CHECK", "0")
 
-SEMGREP_RULESETS = [
-    "p/security-audit",
-    "p/owasp-top-ten",
-    "p/secrets",
-    str(CUSTOM_RULES_FILE),
-    str(AUTH_RULES_FILE),
-]
+RULES_DIR = Path(__file__).resolve().parent / "semgrep-rules"
+VENDORED_DIR = RULES_DIR / "vendored"
+CUSTOM_RULES_FILE = RULES_DIR / "vulnscope.yml"
+AUTH_RULES_FILE = RULES_DIR / "vulnscope-auth.yml"
+
+# Registry pack name -> file name of the local copy kept in semgrep-rules/vendored.
+REGISTRY_PACKS = {
+    "p/security-audit": "security-audit.yml",
+    "p/owasp-top-ten": "owasp-top-ten.yml",
+    "p/secrets": "secrets.yml",
+}
+
+
+def build_rulesets(vendored_dir: Path = VENDORED_DIR) -> list[str]:
+    """Use the local copy of each registry pack when it exists, else the registry name."""
+    rulesets = []
+    for pack, filename in REGISTRY_PACKS.items():
+        local = vendored_dir / filename
+        rulesets.append(str(local) if local.is_file() else pack)
+    rulesets += [str(CUSTOM_RULES_FILE), str(AUTH_RULES_FILE)]
+    return rulesets
+
+
+SEMGREP_RULESETS = build_rulesets()
 
 SEVERITY_MAP = {"ERROR": "high", "WARNING": "medium", "INFO": "low"}
 
